@@ -228,6 +228,8 @@ var ontorrent = function (torrent) {
     var pausedAt = null
 
     VLC_ARGS += ' --meta-title="' + filename.replace(/"/g, '\\"') + '"'
+    MPV_EXEC += ' --force-media-title="' + filename.replace(/"/g, '\\"') + '"'
+    MPVNET_EXEC += ' --force-media-title="' + filename.replace(/"/g, '\\"') + '"'
 
     if (argv.all) {
       filename = engine.torrent.name
