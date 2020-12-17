@@ -33,6 +33,7 @@ var argv = rc('peerflix', {}, optimist
   .describe('mpchc', 'autoplay in MPC-HC player*').boolean('boolean')
   .describe('potplayer', 'autoplay in Potplayer*').boolean('boolean')
   .alias('k', 'mpv').describe('k', 'autoplay in mpv*').boolean('k')
+  .alias('u', 'mpvnet').describe('u', 'autoplay in mpv.net*').boolean('u')
   .alias('o', 'omx').describe('o', 'autoplay in omx**').boolean('o')
   .alias('w', 'webplay').describe('w', 'autoplay in webplay').boolean('w')
   .alias('j', 'jack').describe('j', 'autoplay in omx** using the audio jack').boolean('j')
@@ -74,6 +75,7 @@ var OMX_EXEC = argv.jack ? 'omxplayer -r -o local ' : 'omxplayer -r -o hdmi '
 var MPLAYER_EXEC = 'mplayer ' + (onTop ? '-ontop' : '') + ' -really-quiet -noidx -loop 0 '
 var SMPLAYER_EXEC = 'smplayer ' + (onTop ? '-ontop' : '')
 var MPV_EXEC = 'mpv ' + (onTop ? '--ontop' : '') + ' --really-quiet --loop=no '
+var MPVNET_EXEC = 'mpvnet ' + (onTop ? '--ontop' : '') + ' --really-quiet --loop=no '
 var MPC_HC_ARGS = '/play'
 var POTPLAYER_ARGS = ''
 
@@ -87,6 +89,7 @@ if (argv.t) {
   MPLAYER_EXEC += ' -sub ' + enc(argv.t)
   SMPLAYER_EXEC += ' -sub ' + enc(argv.t)
   MPV_EXEC += ' --sub-file=' + enc(argv.t)
+  MPVNET_EXEC += ' --sub-file=' + enc(argv.t)
   POTPLAYER_ARGS += ' ' + enc(argv.t)
 }
 
@@ -99,6 +102,7 @@ if (argv._.length > 1) {
   MPLAYER_EXEC += ' ' + playerArgs
   SMPLAYER_EXEC += ' ' + playerArgs
   MPV_EXEC += ' ' + playerArgs
+  MPVNET_EXEC += ' ' + playerArgs
   MPC_HC_ARGS += ' ' + playerArgs
   POTPLAYER_ARGS += ' ' + playerArgs
 }
@@ -321,6 +325,13 @@ var ontorrent = function (torrent) {
       player = 'mpv'
       var mpv = proc.exec(MPV_EXEC + ' ' + localHref)
       mpv.on('exit', function () {
+        if (!argv.n && argv.quit !== false) process.exit(0)
+      })
+    }
+    if (argv.mpvnet) {
+      player = 'mpv.net'
+      var mpvnet = proc.exec(MPVNET_EXEC + ' ' + localHref)
+      mpvnet.on('exit', function () {
         if (!argv.n && argv.quit !== false) process.exit(0)
       })
     }
