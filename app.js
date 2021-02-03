@@ -34,6 +34,7 @@ var argv = rc('peerflix', {}, optimist
   .describe('potplayer', 'autoplay in Potplayer*').boolean('boolean')
   .alias('k', 'mpv').describe('k', 'autoplay in mpv*').boolean('k')
   .alias('u', 'mpvnet').describe('u', 'autoplay in mpv.net*').boolean('u')
+  .describe('iina', 'autoplay in IINA (macOS)*').boolean('boolean')
   .alias('o', 'omx').describe('o', 'autoplay in omx**').boolean('o')
   .alias('w', 'webplay').describe('w', 'autoplay in webplay').boolean('w')
   .alias('j', 'jack').describe('j', 'autoplay in omx** using the audio jack').boolean('j')
@@ -76,6 +77,7 @@ var MPLAYER_EXEC = 'mplayer ' + (onTop ? '-ontop' : '') + ' -really-quiet -noidx
 var SMPLAYER_EXEC = 'smplayer ' + (onTop ? '-ontop' : '')
 var MPV_EXEC = 'mpv ' + (onTop ? '--ontop' : '') + ' --really-quiet --loop=no '
 var MPVNET_EXEC = 'mpvnet ' + (onTop ? '--ontop' : '') + ' --really-quiet --loop=no '
+var IINA_EXEC = 'iina --keep-running ' + (onTop ? '--ontop' : '') + ' --really-quiet --loop=no '
 var MPC_HC_ARGS = '/play'
 var POTPLAYER_ARGS = ''
 
@@ -90,6 +92,7 @@ if (argv.t) {
   SMPLAYER_EXEC += ' -sub ' + enc(argv.t)
   MPV_EXEC += ' --sub-file=' + enc(argv.t)
   MPVNET_EXEC += ' --sub-file=' + enc(argv.t)
+  IINA_EXEC += ' --sub-file=' + enc(argv.t)
   POTPLAYER_ARGS += ' ' + enc(argv.t)
 }
 
@@ -103,6 +106,7 @@ if (argv._.length > 1) {
   SMPLAYER_EXEC += ' ' + playerArgs
   MPV_EXEC += ' ' + playerArgs
   MPVNET_EXEC += ' ' + playerArgs
+  IINA_EXEC += ' ' + playerArgs
   MPC_HC_ARGS += ' ' + playerArgs
   POTPLAYER_ARGS += ' ' + playerArgs
 }
@@ -230,6 +234,7 @@ var ontorrent = function (torrent) {
     VLC_ARGS += ' --meta-title="' + filename.replace(/"/g, '\\"') + '"'
     MPV_EXEC += ' --force-media-title="' + filename.replace(/"/g, '\\"') + '"'
     MPVNET_EXEC += ' --force-media-title="' + filename.replace(/"/g, '\\"') + '"'
+    IINA_EXEC += ' --force-media-title="' + filename.replace(/"/g, '\\"') + '"'
 
     if (argv.all) {
       filename = engine.torrent.name
@@ -334,6 +339,13 @@ var ontorrent = function (torrent) {
       player = 'mpv.net'
       var mpvnet = proc.exec(MPVNET_EXEC + ' ' + localHref)
       mpvnet.on('exit', function () {
+        if (!argv.n && argv.quit !== false) process.exit(0)
+      })
+    }
+    if (argv.iina) {
+      player = 'iina'
+      var iina = proc.exec(IINA_EXEC + ' ' + localHref)
+      iina.on('exit', function () {
         if (!argv.n && argv.quit !== false) process.exit(0)
       })
     }
