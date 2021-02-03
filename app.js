@@ -57,7 +57,7 @@ if (argv.version) {
 }
 
 var filename = argv._[0]
-var onTop = !argv.d
+var onTop = argv.d
 
 if (!filename) {
   optimist.showHelp()
